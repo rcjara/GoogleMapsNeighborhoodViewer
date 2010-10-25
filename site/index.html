@@ -1,0 +1,126 @@
+<html>
+	<head>
+		<title>Is this working?</title>
+		<style type="text/css">
+			html { height: 100% }
+			body { height: 100%; margin: 0px; padding: 0px }
+			#map_canvas { height: 100% }
+		</style>
+		<script type="text/javascript"
+				src="http://maps.google.com/maps/api/js?sensor=false">
+		</script>
+		<script type="text/javascript" src="scripts/MapLoader.js"></script>
+		<script type="text/javascript">
+			var pan;
+			var links;
+			var controller;
+			var coder = new google.maps.Geocoder();
+
+			function round_num(num, dec) {
+				var result = Math.round(num * Math.pow(10, dec) ) / Math.pow(10, dec);
+				return result;
+			}
+
+			function angle_between(lat_lng_1, lat_lng_2) {
+				var dif_lat = round_num(lat_lng_2.lat(), 6) - round_num(lat_lng_1.lat(), 6);
+				var dif_lng = round_num(lat_lng_2.lng(), 6) - round_num(lat_lng_1.lng(), 6);
+				if(dif_lng == 0) { return 0; }
+				var angle = 360 * Math.atan( dif_lat / dif_lng ) / (2 * Math.PI);
+				if(dif_lat < 0 || dif_lng < 0) {
+					angle += 180;
+				}
+				return angle;
+			}
+
+			function update_pos() {
+				if(!pan) { return; }
+				var position = pan.getPosition();
+				var heading = pan.getPov().heading;
+				document.getElementById("heading").value = heading;
+				document.getElementById("lat").value = position.lat();
+				document.getElementById("lng").value = position.lng();
+				if(!links) {
+					links = pan.getLinks();
+					if(links) { alert(links.length); }
+				}
+			}
+				
+
+			function initialize() {
+				/*controller = new MapLoader([
+					{streetAddress: "1900 Cassopolis St", zipCode: "46514"},
+					{streetAddress: "1839 Cassopolis St", zipCode: "46514"},
+					{streetAddress: "1832 Cassopolis St", zipCode: "46514"}
+				], "main_body"); */
+
+				//*
+				var latlng = new google.maps.LatLng(41.70539, -85.97197);
+				var myOptions = {
+					zoom: 15,
+					center: latlng,
+					mapTypeId: google.maps.MapTypeId.ROADMAP
+				};
+				var map = new google.maps.Map(document.getElementById("map_canvas"),
+						myOptions);
+
+				coder.geocode({ address: "1648 Cassopolis St, 46514", location: latlng }, 
+					function(response, cdr_status) {
+						if(cdr_status == "OK") {
+							for(var i in response) {
+								alert("key: " + i + " val: " + response[i]);
+							}
+							lat_lng = response[0].geometry.location;
+							var heading = 0;
+							var center = lat_lng;
+
+							if(response[0].geometry.bounds) {
+								center = response[0].geometry.bounds.getCenter();
+								heading = angle_between(latlng, center );
+							}
+
+							var pov = {
+								heading: heading,
+								pitch: 0,
+								zoom: 0
+							};
+
+							var panOptions = {
+								position: center,
+								pov: pov
+							};
+
+							pan = new google.maps.StreetViewPanorama(document.getElementById("pan_canvas"), panOptions);
+							links = pan.getLinks();
+							//var actual_pos = pan.getPosition();
+							//var new_heading = angle_between(actual_pos, latlng);
+							//pov.heading = new_heading;
+							//pan.setPov(pov);
+						} else {
+							alert(cdr_status);
+						}
+				});
+				setInterval( "update_pos()" , 40);
+				//*/
+
+			} 
+
+
+			function dist_sqrd(lat_lng_1, lat_lng_2) {
+				var dif_lat = lat_lng_2.lat() - lat_lng_1.lat();
+				var dif_lng = lat_lng_2.lng() - lat_lng_1.lng();
+				return dif_lat * dif_lat + dif_lng * dif_lng;
+			}
+		
+		</script>
+			
+	</head>
+	<body onload="initialize();">
+		<div id="main_body"></div>
+		<div id="map_canvas" style="height: 50%; width: 50%; float: left"></div>
+		<div id="pan_canvas" style="height: 50%; width: 50%; float: right"></div>
+		<input type="text" id="heading">
+		<input type="text" id="lat">
+		<input type="text" id="lng">
+	</body>
+</html>
+

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rm -r ~/Sites/StreetView/
+cp -r site/ ~/Sites/StreetView/

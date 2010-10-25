@@ -1,0 +1,17 @@
+== Overview ==
+Google Maps Neighborhood Viewer (name may change) is a simple tool to that
+makes use of Google Maps to create panoramas (roughly stitched together) of
+entire streets.  It works by having the user select two points on a map, and
+then filling in all the intermediate points, and creating two Street View
+Panoramas at each intermediate points.  The Panoramas face opposite directions
+along the line perpendicular to the one selected by the user.  In this way, a
+view of all the buildings lining both sides of a street can be easily created.
+
+== Licence ==
+Basically open source.  Fill in more later.
+
+== Organization of Repository ==
+bash_scripts - Store scripts to load the site onto the actual Sites directory on OS X systems
+downloaded - Source code not created by the author of this project
+site - A simple site for testing code
+  scripts - The meaningful code is all in here.
